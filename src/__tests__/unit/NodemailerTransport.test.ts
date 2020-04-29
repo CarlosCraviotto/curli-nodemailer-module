@@ -58,6 +58,27 @@ describe('NodemailerModule class tests', function () {
         stubGetContainer.restore();
     });
 
+
+
+    it('Should create a service for sendmail', function () {
+        const smtpConfig = {transporter_sendmail: {}};
+        const servicesToBeRegistered: Array<string> = [];
+        const stubGetContainer = sinon.stub((DependencyInjectionMock.prototype), 'get');
+
+        stubGetContainer.withArgs('@TRANSPORT_TYPE').returns('sendmail');
+        stubGetContainer.withArgs('@TRANSPORTS_CONFIGURATION').returns(smtpConfig);
+
+        const container = new DependencyInjectionMock();
+
+        container.registerServiceBuilded = (serviceName, _service) => {
+            servicesToBeRegistered.push(serviceName);
+        };
+
+        nodemailerModule.registerServices(container);
+        chai.assert.deepEqual(['email'], servicesToBeRegistered);
+        stubGetContainer.restore();
+    });
+
     it('Should throw an error when try to send no configuration for the transport type.', function () {
         const stubGetContainer = sinon.stub((DependencyInjectionMock.prototype), 'get');
         stubGetContainer.withArgs('@TRANSPORT_TYPE').returns('smtp');
@@ -83,6 +104,21 @@ describe('NodemailerModule class tests', function () {
         chai.assert.throws(function () {
             nodemailerModule.registerServices(container);
         }, 'Unsupported type (notExist) of email transporter');
+        stubGetContainer.restore();
+    });
+
+    it('Should throw an error when try to set a ses transporter (for now).', function () {
+        const smtpConfig = {transporter_ses: {}};
+
+        const stubGetContainer = sinon.stub((DependencyInjectionMock.prototype), 'get');
+        stubGetContainer.withArgs('@TRANSPORT_TYPE').returns('ses');
+        stubGetContainer.withArgs('@TRANSPORTS_CONFIGURATION').returns(smtpConfig);
+
+        const container = new DependencyInjectionMock();
+
+        chai.assert.throws(function () {
+            nodemailerModule.registerServices(container);
+        }, 'Unsupported SES for now.');
         stubGetContainer.restore();
     });
 
