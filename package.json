@@ -52,7 +52,7 @@
   "homepage": "https://github.com/CarlosCraviotto/curli-nodemailer-module#readme",
   "dependencies": {
     "curli-types": "0.0.1-beta.11",
-    "nodemailer": "6.4.6",
+    "nodemailer": "6.4.16",
     "@types/nodemailer": "6.4.0"
   },
   "devDependencies": {
